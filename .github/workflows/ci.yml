@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    # Run this job only on forks as the exercises are
+    # not intended to be pushed to the main repository.
+    if: ${{ github.repository != 'aeddi/gno-workshop' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Install gno tools
+        run: make install_tools
+
+      - name: Run tests
+        run: gno test -v ./...
+
+      - name: Run linter
+        run: gno lint -v .
+
+      - name: Run formatter
+        run: gno fmt -v -diff ./...
